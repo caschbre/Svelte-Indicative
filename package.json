@@ -3,9 +3,14 @@
   "description": "TODO",
   "author": "Craig Aschbrenner",
   "version": "1.0.0",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "private": true,
+  "defaultNamespace": "@svelte-indicative",
   "browserslist": [
     "defaults"
+  ],
+  "workspaces": [
+    "packages/*"
   ],
   "devDependencies": {
     "@babel/core": "7.8.4",
@@ -21,10 +26,12 @@
     "eslint-plugin-svelte3": "2.7.3",
     "husky": "4.2.3",
     "indicative": "7.4.4",
+    "lerna": "3.20.2",
     "lint-staged": "10.0.7",
     "postcss": "7.0.26",
     "postcss-load-config": "2.1.0",
     "prettier": "1.19.1",
+    "pretty-quick": "2.0.1",
     "rollup": "1.31.1",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
