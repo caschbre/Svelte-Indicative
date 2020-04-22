@@ -4,7 +4,6 @@
   "author": "Craig Aschbrenner",
   "version": "1.0.0-alpha.0",
   "license": "MIT",
-  "private": true,
   "defaultNamespace": "@svelte-indicative",
   "browserslist": [
     "defaults"
