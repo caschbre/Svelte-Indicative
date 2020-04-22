@@ -1,8 +1,8 @@
 {
   "name": "svelte-indicative",
-  "description": "Implementation of AdonisJs Indicative form validation.",
+  "description": "Svelte implementation of AdonisJs Indicative form validation.",
   "author": "Craig Aschbrenner",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "license": "MIT",
   "private": true,
   "defaultNamespace": "@svelte-indicative",
@@ -72,7 +72,7 @@
   "module": "dist/index.min.mjs",
   "repository": {
     "type": "git",
-    "url": "TODO"
+    "url": "git@github.com:caschbre/Svelte-Indicative.git"
   },
   "scripts": {
     "build": "rollup -c",
