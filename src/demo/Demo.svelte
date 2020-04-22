@@ -1,22 +1,25 @@
 <script>
-  // @todo ability to read field params (e.g. required, minlength, etc.)
-  import { svelteIndicative } from './indicative.js';
-  import ErrorMessages from './components/ErrorMessages.svelte';
+  import { svelteIndicative } from '../indicative.js';
+  import ErrorMessages from '../components/ErrorMessages.svelte';
 
   let indicativeParams = {
     rules: {
-      email: 'required|email|min:10',
       textfield: 'required|string|min:4',
+      email: 'required|email|min:10',
       singlecheckbox: 'required',
-      multiplecheckboxes: 'min:1',
+      multiplecheckboxes: 'min:2',
       radios: 'required',
-      singleselect: 'required',
       multipleselect: 'min:2'
     },
     messages: {
       required: (field, validation, args) => {
         return `${field} is required.`;
-      }
+      },
+      min: `{{ field }} must be {{ args }} chars long.`,
+      'textfield.min': (field, validation, args) => {
+        return `Textfield must be ${args[0]} characters long.`;
+      },
+      'multiplecheckboxes.min': `Must check at least {{ args }} items.`,
     },
     // @todo
     // sanitizerSchema: {}
@@ -87,10 +90,13 @@
     {/if}
   </div>
 
-  <label class="form-field" class:invalid={!isFieldValid('singlecheckbox')}>
-    <input bind:checked={data.singlecheckbox} type="checkbox" name="singlecheckbox">
-    <span>Single Checkbox</span>
-  </label>
+  <div class="form-field">
+    <label class="form-field" class:invalid={!isFieldValid('singlecheckbox')}>
+      <input bind:checked={data.singlecheckbox} type="checkbox" name="singlecheckbox">
+      <span>Single Checkbox</span>
+    </label>
+    <ErrorMessages field="singlecheckbox" />
+  </div>
 
   <div class="form-field">
     <label>Multiple Checkboxes</label>
@@ -106,6 +112,7 @@
       <input bind:group={data.multiplecheckboxes} type="checkbox" name="multiplecheckboxes" value="checkbox3">
       <span>Checkbox 3</span>
     </label>
+    <ErrorMessages field="multiplecheckboxes" />
   </div>
 
   <div class="form-field">
@@ -122,15 +129,18 @@
       <input bind:group={data.radios} type="radio" name="radios" value="radio3">
       <span>Radio 3</span>
     </label>
+    <ErrorMessages field="radios" />
   </div>
 
   <div class="form-field">
     <label>Single Select</label>
-    <select bind:value={data.singleselect} name="singleselect">
+    <select bind:value={data.singleselect} name="singleselect" required>
+      <option value="">Select...</option>
       <option value="option1">Option 1</option>
       <option value="option2">Option 2</option>
       <option value="option3">Option 3</option>
     </select>
+    <ErrorMessages field="singleselect" />
   </div>
 
   <div class="form-field">
@@ -140,12 +150,13 @@
       <option value="option2">Option 2</option>
       <option value="option3">Option 3</option>
     </select>
+    <ErrorMessages field="multipleselect" />
   </div>
 
   <pre class="form-field">data: {JSON.stringify(data, null, 2)}</pre>
   <pre class="form-field">state: {JSON.stringify($state, null, 2)}</pre>
 
-  <input type="submit" value="input submit">
+  <input type="submit" value="input submit" disabled={!isFormValid}>
   <button type="submit">Submit Button</button>
   <input type="reset" value="input reset">
 </form>

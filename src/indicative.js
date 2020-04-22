@@ -1,10 +1,14 @@
 // @todo add sanitizer.
 // @todo option to validate on load. Useful for disabling submit button.
 // @todo dynamic load validate / validateAll?
+// @todo ability to read fieldNode params (e.g. required, minlength, etc.)
+// @todo ability to validate data on in a form?
 
 import { dirtyStore, errorsStore, isValidatingStore, state } from './stores.js';
 import { validate, validateAll } from 'indicative/validator';
 
+// @todo remove parameters?
+// - @see https://dmitripavlutin.com/javascript-modules-best-practices/#2-no-work-during-import
 const svelteIndicative = ({ rules, messages, options }) => {
   const resetState = () => {
     dirtyStore.set({});
@@ -16,17 +20,20 @@ const svelteIndicative = ({ rules, messages, options }) => {
     return !field ? !!+Object.values(state.dirty).filter(value => !!+value).length : state.dirty[field] || false;
   };
 
-  const isValid = (state, field) => {
-    if (!isDirty(state, field)) {
-      // @todo return null(?) if not dirty to indicate not validated yet?
+  const isValid = (state, field, dirtyResponse) => {
+    if (dirtyResponse === undefined) {
+      dirtyResponse = false;
+    }
+
+    if (field && !isDirty(state, field)) {
       return true;
     }
 
     return !field ? !+Object.values(state.errors).filter(value => value !== false).length : !state.errors[field] || false;
   };
 
-  // @todo combine params with default configuration.
-  // @todo initial/default values?
+  // @todo combine params with default configuration?
+  // @todo initial/default values necessary?
   const validator = (formNode, params) => {
     params = params || {};
 
@@ -40,15 +47,36 @@ const svelteIndicative = ({ rules, messages, options }) => {
     formNode.addEventListener('reset', handleReset);
     formNode.addEventListener('submit', handleSubmit);
 
-    // @todo how to handle error messages and fields not being dirty?
+    // @todo preValidation does trigger error messages. Can validation be
+    // tested without triggering error messages?
     if (preValidate) {
       validateForm();
+    }
+
+    function getFieldNode(field) {
+      return formNode.elements[field] || null;
+    }
+
+    function getFieldNodes() {
+      return Object.keys(rules).reduce((acc, field) => {
+        acc[field] = getFieldNode(field);
+        return acc;
+      }, {});
+    }
+
+    function fieldHasRules(field) {
+      return Object.keys(rules).includes(field);
     }
 
     // This fires on the form when a child element changes so we can
     // handle individual field validation.
     function handleChange(evt) {
       const field = evt.target.name;
+
+      if (!fieldHasRules(field)) {
+        return;
+      }
+
       setDirty(field, true);
       validateField(field);
     }
@@ -60,22 +88,15 @@ const svelteIndicative = ({ rules, messages, options }) => {
     function handleSubmit(evt) {
       evt.preventDefault();
 
-//      validateForm()
-//        .then(console.log)
-//        .catch(console.warn);
-//        .finally(success => {
-//          console.log('foobar', success);
-//
-//          formNode.dispatchEvent(
-//            new CustomEvent('validated', {
-//              bubbles: true,
-//              cancelable: true,
-//              detail: {
-//                success
-//              }
-//            })
-//          );
-//        });
+      validateForm()
+        .finally(() => {
+          formNode.dispatchEvent(
+            new CustomEvent('validated', {
+              bubbles: true,
+              cancelable: true,
+            })
+          );
+        });
     }
 
     async function doValidate(data, validateRules) {
@@ -85,9 +106,7 @@ const svelteIndicative = ({ rules, messages, options }) => {
 
       isValidatingStore.set(true);
 
-      // @todo validate / validateAll.
       return await validateHandler(data, validateRules, messages, options)
-        // @todo clear errors for field or all errors.
         .then(results => {
           Object.keys(results).forEach(clearError);
           return true;
@@ -118,15 +137,16 @@ const svelteIndicative = ({ rules, messages, options }) => {
     }
 
     async function validateForm() {
-      const data = Object.keys(rules).reduce((acc, field) => {
-        clearError(field);
-        acc[field] = getFieldValues(field);
-        return acc;
-      }, {});
-      return doValidate(data);
+      Object.keys(fieldNodes).forEach(field => {
+        validateField(field);
+      });
     }
 
-    function validateField(field) {
+    async function validateField(field) {
+      if (!fieldHasRules(field)) {
+        return;
+      }
+
       // We use getFieldValues here instead of the values parameter due to
       // elements like checkboxes, selects, etc. that allow for multi-value.
       const data = { [field]: getFieldValues(field) };
@@ -225,13 +245,6 @@ const svelteIndicative = ({ rules, messages, options }) => {
         delete current[field];
         return current;
       });
-    }
-
-    function getFieldNodes() {
-      return Object.keys(rules).reduce((acc, field) => {
-        acc[field] = formNode.elements[field] || null;
-        return acc;
-      }, {});
     }
 
     return {
