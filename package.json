@@ -1,9 +1,11 @@
 {
   "name": "svelte-indicative",
-  "description": "TODO",
+  "description": "Svelte implementation of AdonisJs Indicative form validation.",
   "author": "Craig Aschbrenner",
-  "version": "1.0.0",
-  "license": "UNLICENSED",
+  "version": "1.0.0-alpha.0",
+  "license": "MIT",
+  "private": true,
+  "defaultNamespace": "@svelte-indicative",
   "browserslist": [
     "defaults"
   ],
@@ -12,6 +14,8 @@
     "@babel/plugin-syntax-dynamic-import": "7.8.3",
     "@babel/plugin-transform-runtime": "7.8.3",
     "@babel/preset-env": "7.8.4",
+    "@commitlint/cli": "8.3.5",
+    "@commitlint/config-conventional": "8.3.4",
     "@testing-library/cypress": "5.3.0",
     "autoprefixer": "9.7.4",
     "cypress": "4.0.2",
@@ -25,6 +29,7 @@
     "postcss": "7.0.26",
     "postcss-load-config": "2.1.0",
     "prettier": "1.19.1",
+    "pretty-quick": "2.0.1",
     "rollup": "1.31.1",
     "rollup-plugin-babel": "4.3.3",
     "rollup-plugin-commonjs": "10.1.0",
@@ -47,7 +52,13 @@
     }
   },
   "keywords": [
-    "svelte"
+    "forms",
+    "validation",
+    "indicative",
+    "svelte",
+    "svelte3",
+    "svelte-components",
+    "sveltejs"
   ],
   "lint-staged": {
     "*.{html, css, scss, stylus, js, ts, json, yml, md}": [
@@ -61,7 +72,7 @@
   "module": "dist/index.min.mjs",
   "repository": {
     "type": "git",
-    "url": "TODO"
+    "url": "git@github.com:caschbre/Svelte-Indicative.git"
   },
   "scripts": {
     "build": "rollup -c",
@@ -73,6 +84,5 @@
     "start": "sirv public",
     "test": "start-server-and-test dev http://localhost:5000 cy:run"
   },
-  "svelte": "src/components/components.module.js",
-  "dependencies": {}
+  "svelte": "src/components.module.js"
 }

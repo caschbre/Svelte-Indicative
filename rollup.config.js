@@ -7,14 +7,14 @@ import pkg from './package.json';
 import resolve from 'rollup-plugin-node-resolve';
 import svelte from 'rollup-plugin-svelte';
 
-const production = !process.env.ROLLUP_WATCH;
+const production = !process.env.ROLLUP_WATCH || process.env.PRODUCTION;
 const name = pkg.name
 	.replace(/^(@\S+\/)?(svelte-)?(\S+)/, '$3')
 	.replace(/^\w/, (m) => m.toUpperCase())
 	.replace(/-\w/g, (m) => m[1].toUpperCase());
 
 export default {
-	input: !production ? 'src/main.js' : 'src/components/components.module.js',
+	input: !production ? 'src/demo/main.js' : 'src/components.module.js',
 	output: !production
 		? {
 				sourcemap: true,
@@ -65,6 +65,7 @@ export default {
 		// consult the documentation for details:
 		// https://github.com/rollup/rollup-plugin-commonjs
 		resolve({
+      preferBuiltins: false,
 			browser: true,
 			dedupe: (importee) =>
 				importee === 'svelte' || importee.startsWith('svelte/'),
@@ -83,8 +84,12 @@ export default {
 
 		// If we're building for production (npm run build
 		// instead of npm run dev), minify
-		production && terser(),
+    production && terser({
+      module: true
+    }),
 	],
+  context: 'null',
+  moduleContext: 'null',
 	watch: {
 		clearScreen: false,
 	},

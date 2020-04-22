@@ -4,12 +4,17 @@
 	"endOfLine": "lf",
 	"htmlWhitespaceSensitivity": "css",
 	"insertPragma": false,
+  "plugins": ["prettier-plugin-svelte"],
 	"printWidth": 80,
 	"proseWrap": "preserve",
 	"requirePragma": false,
 	"semi": true,
 	"singleQuote": true,
-	"tabWidth": 4,
+  "svelteSortOrder": "scripts-markup-styles",
+  "svelteStrictMode": true,
+  "svelteBracketNewLine": true,
+  "svelteAllowShorthand": true,
+	"tabWidth": 2,
 	"trailingComma": "es5",
-	"useTabs": true
+	"useTabs": false
 }
