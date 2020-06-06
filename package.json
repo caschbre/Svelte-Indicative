@@ -2,7 +2,7 @@
   "name": "svelte-indicative",
   "description": "Svelte implementation of AdonisJs Indicative form validation.",
   "author": "Craig Aschbrenner",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-alpha.1",
   "license": "MIT",
   "defaultNamespace": "@svelte-indicative",
   "browserslist": [
