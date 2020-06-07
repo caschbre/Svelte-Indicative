@@ -4,6 +4,7 @@
 // @todo ability to read fieldNode params (e.g. required, minlength, etc.)
 // @todo ability to validate data on in a form?
 
+import { tick } from 'svelte';
 import { dirtyStore, errorsStore, isValidatingStore, state } from './stores.js';
 import { validate, validateAll } from 'indicative/validator';
 
@@ -89,7 +90,8 @@ const svelteIndicative = ({ rules, messages, options }) => {
       evt.preventDefault();
 
       validateForm()
-        .finally(() => {
+        .finally(async () => {
+          await tick();
           formNode.dispatchEvent(
             new CustomEvent('validated', {
               bubbles: true,
@@ -99,12 +101,15 @@ const svelteIndicative = ({ rules, messages, options }) => {
         });
     }
 
-    async function doValidate(data, validateRules) {
+    async function doValidate(data, validateRules, ignoreState) {
       validateRules = validateRules || rules;
+      ignoreState = ignoreState || false;
 
       const validateHandler = validateAllFields ? validateAll : validate;
 
-      isValidatingStore.set(true);
+      if (!ignoreState) {
+        isValidatingStore.set(true);
+      }
 
       return await validateHandler(data, validateRules, messages, options)
         .then(results => {
@@ -132,17 +137,30 @@ const svelteIndicative = ({ rules, messages, options }) => {
           return false;
         })
         .finally(() => {
-          isValidatingStore.set(false);
+          if (!ignoreState) {
+            isValidatingStore.set(false);
+          }
         });
     }
 
     async function validateForm() {
+      let validators = [];
+
+      isValidatingStore.set(true);
+
       Object.keys(fieldNodes).forEach(field => {
-        validateField(field);
+        validators[field] = validateField(field, true);
       });
+
+      Promise.all(validators)
+        .finally(() => {
+          isValidatingStore.set(false);
+        });
     }
 
-    async function validateField(field) {
+    async function validateField(field, validatingForm) {
+      validatingForm = validatingForm || false;
+
       if (!fieldHasRules(field)) {
         return;
       }
@@ -152,7 +170,7 @@ const svelteIndicative = ({ rules, messages, options }) => {
       const data = { [field]: getFieldValues(field) };
       const validateRules = { [field]: rules[field] };
       clearError(field);
-      doValidate(data, validateRules);
+      doValidate(data, validateRules, validatingForm);
     }
 
     function getFieldValues(field) {

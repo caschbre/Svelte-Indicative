@@ -54,11 +54,11 @@
   };
 
   const onSubmit = (evt) => {
-    console.log('onSubmit', evt);
+    console.log('onSubmit', isValidating, isFormValid);
   };
 
   const onValidated = (results) => {
-    console.log('onValidated', results);
+    console.log('onValidated', isValidating, isFormValid);
   };
 </script>
 
