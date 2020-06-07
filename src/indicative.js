@@ -21,12 +21,12 @@ const svelteIndicative = ({ rules, messages, options }) => {
     return !field ? !!+Object.values(state.dirty).filter(value => !!+value).length : state.dirty[field] || false;
   };
 
-  const isValid = (state, field, dirtyResponse) => {
-    if (dirtyResponse === undefined) {
-      dirtyResponse = false;
+  const isValid = (state, field, ignoreDirtyState) => {
+    if (ignoreDirtyState === undefined) {
+      ignoreDirtyState = false;
     }
 
-    if (field && !isDirty(state, field)) {
+    if (field && !ignoreDirtyState && !isDirty(state, field)) {
       return true;
     }
 
@@ -152,7 +152,7 @@ const svelteIndicative = ({ rules, messages, options }) => {
         validators[field] = validateField(field, true);
       });
 
-      Promise.all(validators)
+      await Promise.all(validators)
         .finally(() => {
           isValidatingStore.set(false);
         });
